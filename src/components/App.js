@@ -1,71 +1,76 @@
 import React, { useState, useEffect } from 'react';
-import { Form } from './Form/Form';
-import { ContactList } from './ContactList/ContactList';
-import { Filter } from './Filter/Filter';
+import { connect } from 'react-redux';
+import Form from './Form/Form';
+import ContactList from './ContactList/ContactList';
+import Filter from './Filter/Filter';
 import { Notification } from './Notification/Notification';
+import { setLocalData, setNotify } from '../redux/actions';
+// import * as actions from '../redux/actions';
 
 import { CSSTransition } from 'react-transition-group';
 
 import './app.css';
 
-export default function App() {
-  const [state, setState] = useState({
-    contacts: [],
-    name: '',
-    filter: '',
-  });
+export function App({ value, setLocalData, notify, setNotify }) {
+  // const [state, setState] = useState({
+  //   contacts: {
+  //     items: [],
+  //     filter: '',
+  //   },
+  // });
 
-  const [filterItems, setFilterItems] = useState([]);
-
-  useEffect(() => {
-    const contacts = localStorage.getItem('contacts');
-    const contactsParsed = JSON.parse(contacts);
-    if (contactsParsed) {
-      setState({ contacts: contactsParsed });
-    }
-  }, []);
-
-  const getName = data => {
-    setState(prev => ({ ...prev, name: data }));
-  };
+  // const [filterItems, setFilterItems] = useState([]);
 
   useEffect(() => {
-    localStorage.setItem('contacts', JSON.stringify(state.contacts));
-    if (state.filter) {
-      setFilterItems(
-        state.contacts.filter(el =>
-          el.name.toLowerCase().includes(state.filter.toLowerCase()),
-        ),
-      );
-    } else {
-      setFilterItems([]);
+    const items = localStorage.getItem('items');
+    const itemsParsed = JSON.parse(items);
+    if (itemsParsed) {
+      setLocalData(itemsParsed);
     }
-  }, [state.filter, state.contacts]);
+  }, [setLocalData]);
 
-  const [notify, setNotify] = useState(false);
+  useEffect(() => {
+    localStorage.setItem('items', JSON.stringify(value));
+    // if (filteredArr) {
+    //   setFilterItems(
+    //     value.filter(el =>
+    //       el.name.toLowerCase().includes(filter.toLowerCase()),
+    //     ),
+    //   );
+    // } else {
+    //   setFilterItems([]);
+    // }
+  }, [value]);
 
-  const getContact = contact => {
-    let flag = true;
+  // const [notify, setNotify] = useState(false);
 
-    state.contacts.map(el => (el.name === contact.name ? (flag = false) : ''));
-    flag
-      ? setState(prev => ({ ...prev, contacts: [...prev.contacts, contact] }))
-      : notifyTrue();
-  };
+  // const getContact = item => {
+  //   let flag = true;
 
-  const notifyTrue = () => {
-    setNotify(true);
-  };
+  //   state.contacts.items.map(el =>
+  //     el.name === item.name ? (flag = false) : '',
+  //   );
+  //   flag
+  //     ? setState(prev => ({
+  //         ...prev,
+  //         contacts: { items: [...prev.contacts.items, item] },
+  //       }))
+  //     : notifyTrue();
+  // };
 
-  const getFilterName = value => {
-    setState(prev => ({ ...prev, filter: value }));
-  };
+  // const notifyTrue = () => {
+  //   setNotify(true);
+  // };
 
-  const deleteContact = contactId => {
-    setState(prev => ({
-      contacts: prev.contacts.filter(contact => contact.id !== contactId),
-    }));
-  };
+  // const getFilterName = value => {
+  //   setState(prev => ({ ...prev, contacts: { filter: value } }));
+  // };
+
+  // const deleteContact = contactId => {
+  //   setState(prev => ({
+  //     contacts: prev.contacts.filter(contact => contact.id !== contactId),
+  //   }));
+  // };
 
   return (
     <>
@@ -87,9 +92,9 @@ export default function App() {
       >
         <h2 className="title">Phonebook</h2>
       </CSSTransition>
-      <Form getContact={getContact} getName={getName} />
+      <Form />
       <CSSTransition
-        in={state.contacts.length >= 1}
+        in={value.length >= 1}
         timeout={300}
         unmountOnExit
         classNames="title-contacts"
@@ -97,21 +102,37 @@ export default function App() {
         <h2 className="title-contacts">Contacts</h2>
       </CSSTransition>
       <CSSTransition
-        in={state.contacts.length >= 2}
+        in={value.length >= 2}
         timeout={300}
         unmountOnExit
         classNames="filter"
       >
-        <Filter filter={state.filter} getFilterName={getFilterName} />
+        <Filter />
       </CSSTransition>
-      <ContactList
-        contactList={filterItems.length > 0 ? filterItems : state.contacts}
-        deleteContact={deleteContact}
-      />
+      <ContactList />
     </>
   );
 }
 
+const mapStateToProps = state => ({
+  value: state.contacts.items,
+  filter: state.contacts.filter,
+  notify: state.contacts.setNotify,
+});
+const mapDispatchToProps = { setLocalData, setNotify };
+export default connect(mapStateToProps, mapDispatchToProps)(App);
+
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 //? На классах
 // export default class App extends Component {
 //   state = {

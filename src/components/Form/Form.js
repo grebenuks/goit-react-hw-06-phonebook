@@ -2,12 +2,20 @@ import React, { useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import PropTypes from 'prop-types';
 import styles from './form.module.css';
+import { connect } from 'react-redux';
+import { getFormValue, setNotify } from '../../redux/actions';
 
-export function Form({ getName, getContact }) {
+function Form({ getFormValue, items, setNotify }) {
   const [state, setState] = useState({ name: '', number: '' });
 
   const handleNameChange = ({ target: { name, value } }) => {
     setState(prev => ({ ...prev, [name]: value }));
+  };
+
+  // const [notify, setNotify] = useState(false);
+
+  const notifyTrue = () => {
+    setNotify(true);
   };
 
   const hanndleSubmit = e => {
@@ -16,9 +24,19 @@ export function Form({ getName, getContact }) {
     if (state.name === '' || state.number === '') {
       return;
     } else {
-      getContact({ ...state, id: uuidv4() });
+      const input = e.target.elements;
+      let flag = true;
+
+      items.map(el => (el.name === input[0].value ? (flag = false) : ''));
+
+      flag
+        ? getFormValue({
+            name: input[0].value,
+            number: input[1].value,
+            id: uuidv4(),
+          })
+        : notifyTrue();
     }
-    setState({ name: '', number: '' });
     form.reset();
   };
 
@@ -55,6 +73,19 @@ Form.propTypes = {
   getName: PropTypes.func,
 };
 
+const mapStateToProps = state => ({ items: state.contacts.items });
+const mapDispatchToProps = { getFormValue, setNotify };
+export default connect(mapStateToProps, mapDispatchToProps)(Form);
+
+//
+//
+//
+//
+//
+//
+//
+//
+//
 //? На классах
 // export class Form extends Component {
 //   state = {

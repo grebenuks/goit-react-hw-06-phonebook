@@ -1,27 +1,26 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
+import { deleteContact } from '../../redux/actions';
 import './contactList.css';
 
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
 
-export function ContactList({ contactList, deleteContact }) {
+export function ContactList({ value, deleteContact }) {
   return (
     <TransitionGroup component="ul" className="list">
-      {contactList.map(contact => {
+      {value.map(item => {
         return (
           <CSSTransition
-            key={contact.id}
+            key={item.id}
             timeout={250}
             classNames="adddelete"
             unmountOnExit
           >
-            <li className="item" key={contact.id}>
-              <span>{contact.name}</span>
-              <span>: {contact.number}</span>
-              <button
-                className="button"
-                onClick={() => deleteContact(contact.id)}
-              >
+            <li className="item" key={item.id}>
+              <span>{item.name}</span>
+              <span>: {item.number}</span>
+              <button className="button" onClick={() => deleteContact(item.id)}>
                 Delete
               </button>
             </li>
@@ -41,3 +40,9 @@ ContactList.propTypes = {
   }),
   deleteContact: PropTypes.func,
 };
+const mapStateToProps = state => ({
+  value: state.contacts.filteredItems
+    ? state.contacts.filteredItems
+    : state.contacts.items,
+});
+export default connect(mapStateToProps, { deleteContact })(ContactList);
