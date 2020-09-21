@@ -40,9 +40,13 @@ ContactList.propTypes = {
   }),
   deleteContact: PropTypes.func,
 };
+
 const mapStateToProps = state => ({
   value: state.contacts.filteredItems
     ? state.contacts.filteredItems
     : state.contacts.items,
 });
-export default connect(mapStateToProps, { deleteContact })(ContactList);
+
+const mapDispatchToProps = { deleteContact };
+
+export default connect(mapStateToProps, mapDispatchToProps)(ContactList);
